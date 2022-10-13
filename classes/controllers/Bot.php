@@ -8,7 +8,7 @@ class Bot extends \Basic\Basic {
 		}
 		$message = $_POST['message']['text'];
 
-		if ($message == '/start') {
+		if (substr($message, 0, 6) == '/start') {
 			$data = self::start();
 		} else {
 			$data = self::badCommand();
@@ -41,9 +41,10 @@ class Bot extends \Basic\Basic {
 
 		if (is_numeric($from['id'])) {
 			$user = parent::checkUser($from);
+			self::checkReferral();
 
 			$data = [
-				'text' => "Приветственный копирайт",
+				'text' => "Привет! Хочешь пройти тестирование и узнать, какая профессия идеально подходит именно тебе?",
 				'chat_id' => $chat,
 				'reply_markup' => [
 					'inline_keyboard' => [
@@ -69,7 +70,7 @@ class Bot extends \Basic\Basic {
 			$user = parent::checkUser($from);
 
 			$data = [
-				'text' => "Приветственный копирайт",
+				'text' => "Пожалуйста, \nиспользуй кнопку",
 				'chat_id' => $chat,
 				'reply_markup' => [
 					'inline_keyboard' => [
@@ -85,5 +86,92 @@ class Bot extends \Basic\Basic {
 			return $data;
 		}
 		return false;
+	}
+
+	private static function checkReferral() {
+		$db = parent::getDb();
+		$ref = $_POST['message']['text'];
+		$referral = substr($ref, 7);
+
+		if (is_numeric($referral)) {
+			$user = $db->select("SELECT * FROM users WHERE id = {?}", array($referral))[0];
+
+			if ($user) {
+				$db->query("UPDATE main SET referral = referral + 1");
+				$user['referral'] += 1;
+				$db->query("UPDATE users SET referral = {?} WHERE id = {?}", array($user['referral'], $user['id']));
+				$settings = $db->select("SELECT * FROM main")[0];
+				$code = $user['promo'];
+
+				if ($user['referral'] > 2 && $user['promo'] == 0) {
+					$code = $settings['promo'] + 1;
+					$db->query("UPDATE users SET promo = {?}, time = {?} WHERE id = {?}", array($code, time(), $user['id']));
+					$db->query("UPDATE main SET promo = {?}", array($code));
+				}
+
+				if (strlen((string) $code) === 1) {
+					$code = '000' . $code;
+				} else if (strlen((string) $code) === 2) {
+					$code = '00' . $code;
+				} else if (strlen((string) $code) === 3) {
+					$code = '0' . $code;
+				}
+				$code = 'LernaTG' . $code;
+
+				$text = array(
+					'Один из твоих друзей перешел по ссылке – вместе учиться веселее 😉',
+					"Еще один друг перешел по твоей ссылке! 🥳 \nПригласи ещё одного и получишь промокод с дополнительной ссылкой на обучение 🙂",
+					"Ура, твои друзья теперь тоже с нами! Лови промокод с дополнительной скидкой: <code>" . $code . "</code>. Размер финальной скидки можешь узнать у менеджера 😊",
+					"Ура, твои друзья теперь тоже с нами! Ты же не забыл про свой промокод <code>" . $code . "</code>? Успей им воспользоваться и узнай размер финальной скидки у менеджера 😊"
+				);
+				$text = $user['referral'] > 4 ? $text[3] : $text[$user['referral'] - 1];
+				$data = [
+					'text' => $text,
+					'chat_id' => $user['id'],
+					'parse_mode' => 'html',
+					'reply_markup' => [
+						'inline_keyboard' => [
+							[
+								[
+									'text' => 'Узнать профессию',
+									'web_app' => ['url' => 'https://lerna-client.irsapp.ru']
+								]
+							]
+						]
+					]
+				];
+				self::sendTelegram('sendMessage', $data);
+			}
+		}
+	}
+
+	public static function sendPhoto($id, $texure) {
+		global $config;
+		$path = realpath(__DIR__ . '/../../uploads') . '/' . $texure . '.png';
+		$data = [
+			'caption' => 'А вот и твой аватар! Сохраняй и делись им с друзьями 😉',
+			'chat_id' => $id,
+			'photo' => new CurlFile($path),
+			'parse_mode' => 'html',
+			'reply_markup' => json_encode([
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'Узнать профессию',
+							'web_app' => ['url' => 'https://lerna-client.irsapp.ru']
+						]
+					]
+				]
+			])
+		];
+		$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
+		$ch = curl_init(); 
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			"Content-Type: multipart/form-data"
+		));
+		curl_setopt($ch, CURLOPT_URL, $url); 
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
+		$result = curl_exec($ch);
 	}
 }

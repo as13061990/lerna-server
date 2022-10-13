@@ -14,6 +14,8 @@ require_once('classes/controllers/Statistics.php');
 RouterLite::addRoute('', 'Admin/main');
 RouterLite::addRoute('/bot', 'Bot/main');
 RouterLite::addRoute('/test', 'API/test');
+RouterLite::addRoute('/getData', 'API/getData');
+RouterLite::addRoute('/sendAvatar', 'API/sendAvatar');
 RouterLite::addRoute('/notFound', 'API/notFound');
 RouterLite::dispatch();
 
