@@ -83,4 +83,8 @@ class API extends \Basic\Basic {
         imagecopymerge($dst_im, $cut, $dst_x, $dst_y, 0, 0, $src_w, $src_h, $pct);
         ImageDestroy($cut);
 	}
+
+	public static function sendResult() {
+		
+	}
 }
