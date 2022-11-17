@@ -10,6 +10,8 @@ class Bot extends \Basic\Basic {
 
 		if (substr($message, 0, 6) == '/start') {
 			$data = self::start();
+		} else if (substr($_POST['callback_query']['data'], 0, 8) == 'referral') {
+			$data = self::referral();
 		} else {
 			$data = self::badCommand();
 		}
@@ -56,6 +58,23 @@ class Bot extends \Basic\Basic {
 						]
 					]
 				]
+			];
+			return $data;
+		}
+		return false;
+	}
+
+	private static function referral() {
+		$from = $_POST['callback_query']['from'];
+
+		if (is_numeric($from['id'])) {
+			$user = parent::checkUser($from);
+			$chat = $from['id'];
+
+			$data = [
+				'text' => "Чтобы получить промокод на дополнительную скидку, нужно направить пригласительную ссылку своим друзьям. Как только 3 ваших друга перейдут по ссылке и запустят бота, вы получите уведомление и персональный промокод со скидкой на образовательный курс! 😊\n\nВаша уникальная ссылка:\nt.me/Lerna_career_bot?start=" . $chat,
+				'parse_mode' => 'html',
+				'chat_id' => $chat
 			];
 			return $data;
 		}
@@ -145,11 +164,12 @@ class Bot extends \Basic\Basic {
 		}
 	}
 
-	public static function sendPhoto($id, $texure) {
+	public static function sendPhoto($id, $texure, $pro) {
 		global $config;
+
 		$path = realpath(__DIR__ . '/../../uploads') . '/' . $texure . '.png';
 		$data = [
-			'caption' => 'А вот и твой аватар! Сохраняй и делись им с друзьями 😉',
+			'caption' => $pro['text'],
 			'chat_id' => $id,
 			'photo' => new CurlFile($path),
 			'parse_mode' => 'html',
@@ -157,9 +177,13 @@ class Bot extends \Basic\Basic {
 				'inline_keyboard' => [
 					[
 						[
-							'text' => 'Узнать профессию',
-							'web_app' => ['url' => 'https://lerna-client.irsapp.ru']
-						]
+							'text' => 'Пригласить друзей',
+							"callback_data" => "referral"
+						],
+						[
+							'text' => 'Оформить курс',
+							'url' => $pro['url']
+						],
 					]
 				]
 			])

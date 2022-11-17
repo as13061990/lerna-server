@@ -3,8 +3,7 @@
 class API extends \Basic\Basic {
 	
 	public static function test() {
-		Bot::sendPhoto(771545999, 771545999);
-		// parent::success('test');
+		parent::success('test');
 	}
 
 	public static function notFound() {
@@ -28,18 +27,26 @@ class API extends \Basic\Basic {
 	public static function sendAvatar() {
 		$file = realpath(__DIR__ . '/../../templates/images') . '/' . $_POST['texture'] . '.png';
 
-		if (is_numeric($_POST['id']) && is_bool($_POST['old']) && file_exists($file)) {
+		$portal = $_POST['skillbox'] ? 'skillbox' : 'geekbrains';
+		$data = include('professions.php');
+		$pro = $data[$portal][$_POST['vector']][$_POST['index']];
+		
+		if (is_numeric($_POST['id']) && is_bool($_POST['old']) && file_exists($file) && $data) {
 			$old = $_POST['old'] ? 1 : 0;
-			$texture = $_POST['texture'] . $old;
+			$texture = $_POST['texture'] . $old . '-' . $_POST['vector'];
 			$exist = file_exists(realpath(__DIR__ . '/../../uploads') . '/' . $texture . '.png');
 
 			if (!$exist) {
+				$width = 2122;
+				$height = 1400;
 				$gender = substr($_POST['texture'], 0, 4) === 'male' ? 'male' : 'female';
-
-				$width = $gender === 'male' ? 398 : 380;
-				$height = $gender === 'male' ? 1128 : 1166;
-
 				$canvas = self::createCanvas($width, $height);
+				
+				$bg = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/result-' . $_POST['vector'] . '.png');
+				imagealphablending($bg, false);
+				imagesavealpha($bg, true);
+				self::imagecopymerge_alpha($canvas, $bg, 0, 0, 0, 0, $width, $height, 100);
+				ImageDestroy($bg);
 
 				$user = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $gender . '.png');
 				imagealphablending($user, false);
@@ -63,7 +70,7 @@ class API extends \Basic\Basic {
 				}
 				imagepng($canvas, realpath(__DIR__ . '/../../uploads') . '/' . $texture . '.png');
 			}
-			Bot::sendPhoto($_POST['id'], $texture);
+			Bot::sendPhoto($_POST['id'], $texture, $pro);
 		}
 	}
 
