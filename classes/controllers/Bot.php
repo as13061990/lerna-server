@@ -179,11 +179,13 @@ class Bot extends \Basic\Basic {
 						[
 							'text' => 'Пригласить друзей',
 							"callback_data" => "referral"
-						],
+						]
+					],
+					[
 						[
 							'text' => 'Оформить курс',
 							'url' => $pro['url']
-						],
+						]
 					]
 				]
 			])
