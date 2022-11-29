@@ -109,7 +109,7 @@ $skillbox = array(
     ],
     [
       "text" => "<b>Поздравляем, вы прирождённый Сценарист!</b>\nРазработка идей для кино и сериалов, прописывание харизматичных персонажей – ваш конек!\n\nХотите попробовать себя или улучшить навыки?\nСпециально для вас промокод со скидкой на курс от онлайн-школы SkillBox: <b>LernaTelegramSB</b>\n\nА если трое ваших друзей пройдут тест, вы получите промокод на дополнительную скидку – поделитесь с ними ссылкой 😉",
-      "url" => "https://skillbox.by/course/profession-unity/?utm_source=org.telegram.messenger&utm_medium=referral&utm_campaign=390_profession-screenwriter_org.telegram.messenger_referral_bot_course_by_multimedia_skillbox"
+      "url" => "https://skillbox.by/course/profession-screenwriter/?utm_source=org.telegram.messenger&utm_medium=referral&utm_campaign=390_profession-screenwriter_org.telegram.messenger_referral_bot_course_by_multimedia_skillbox"
     ]
   ]
 );
