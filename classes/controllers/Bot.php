@@ -12,6 +12,8 @@ class Bot extends \Basic\Basic {
 			$data = self::start();
 		} else if (substr($_POST['callback_query']['data'], 0, 8) == 'referral') {
 			$data = self::referral();
+		} else if (substr($_POST['callback_query']['data'], 0, 12) == 'sendReferral') {
+			$data = self::sendReferral();
 		} else {
 			$data = self::badCommand();
 		}
@@ -21,7 +23,7 @@ class Bot extends \Basic\Basic {
 		}
 	}
 
-	private static function sendTelegram($method, $data, $headers = []) {
+	public static function sendTelegram($method, $data, $headers = []) {
 		global $config;
 		$curl = curl_init();
 		curl_setopt_array($curl, [
@@ -199,5 +201,34 @@ class Bot extends \Basic\Basic {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
 		$result = curl_exec($ch);
+	}
+
+	private static function sendReferral() {
+		$id = $_POST['callback_query']['from']['id'];
+		$data = $_POST['callback_query']['data'];
+		$portal = substr($data, 14);
+		$vector = substr($data, 13, 1);
+		$index = substr($data, 12, 1);
+		$professions = include('professions.php');
+		$pro = $professions[$portal][$vector][$index];
+
+		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
+		$data = [
+			'text' => "Чтобы получить промокод на дополнительную скидку, пригласите своих друзей пройти тест. Как только 3 ваших друга перейдут по ссылке и запустят бота, вы получите уведомление и персональный промокод со скидкой на образовательный курс! 😊\n\nВаша уникальная ссылка: ". $referral,
+			'chat_id' => $id,
+			'parse_mode' => 'html',
+			'disable_web_page_preview' => true,
+			'reply_markup' => [
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'Оформить курс',
+							'url' => $pro['url']
+						]
+					]
+				]
+			]
+		];
+		return $data;
 	}
 }

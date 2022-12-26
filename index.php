@@ -16,7 +16,9 @@ RouterLite::addRoute('/bot', 'Bot/main');
 RouterLite::addRoute('/test', 'API/test');
 RouterLite::addRoute('/getData', 'API/getData');
 RouterLite::addRoute('/sendAvatar', 'API/sendAvatar');
-RouterLite::addRoute('/sendResult', 'API/sendResult');
+RouterLite::addRoute('/moreProfessions', 'API/moreProfessions');
+RouterLite::addRoute('/referral', 'API/referral');
+RouterLite::addRoute('/downloadTrack', 'API/downloadTrack');
 RouterLite::addRoute('/notFound', 'API/notFound');
 RouterLite::dispatch();
 

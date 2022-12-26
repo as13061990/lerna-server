@@ -91,7 +91,100 @@ class API extends \Basic\Basic {
         ImageDestroy($cut);
 	}
 
-	public static function sendResult() {
+	public static function moreProfessions() {
+		$id = $_POST['id'];
+		$portal = $_POST['portal'];
+		$vector = $_POST['vector'];
+		$index = $_POST['index'];
+		$data = include('professions.php');
+		$professions = $data[$portal][$vector];
+		$result = [];
+		$count = count($professions);
+
+		for ($i = 0; $i < $count; $i++) {
+			$pro = $professions[$i];
+
+			if ($i !== $index) {
+				array_push($result, $pro);
+			}
+		}
+		shuffle($result);
 		
+		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
+		$link1 = "    1. <u><a href=\"" . $result[0]['url'] . "\">" . $result[0]['name'] . "</a></u>\n    " . $result[0]['short_descr'];
+		$link2 = "    2. <u><a href=\"" . $result[1]['url'] . "\">" . $result[1]['name'] . "</a></u>\n    " . $result[1]['short_descr'];
+
+		$message = [
+			'text' => "Также вам подойдут такие профессии, как:\n" . $link1 . "\n" . $link2 . "\n\nДля получения дополнительной скидки на курс не забудьте пригласить трех друзей: " . $referral,
+			'chat_id' => $id,
+			'parse_mode' => 'html',
+			'disable_web_page_preview' => true
+		];
+		Bot::sendTelegram('sendMessage', $message);
+	}
+
+	public static function referral() {
+		$id = $_POST['id'];
+		$portal = $_POST['portal'];
+		$vector = $_POST['vector'];
+		$index = $_POST['index'];
+		$data = include('professions.php');
+		$pro = $data[$portal][$vector][$index];
+
+		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
+		$message = [
+			'text' => "Чтобы получить промокод на дополнительную скидку, пригласите своих друзей пройти тест. Как только 3 ваших друга перейдут по ссылке и запустят бота, вы получите уведомление и персональный промокод со скидкой на образовательный курс! 😊\n\nВаша уникальная ссылка: ". $referral,
+			'chat_id' => $id,
+			'parse_mode' => 'html',
+			'disable_web_page_preview' => true,
+			'reply_markup' => [
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'Оформить курс',
+							'url' => $pro['url']
+						]
+					]
+				]
+			]
+		];
+		Bot::sendTelegram('sendMessage', $message);
+	}
+
+	public static function downloadTrack() {
+		$id = $_POST['id'];
+		$portal = $_POST['portal'];
+		$vector = $_POST['vector'];
+		$index = $_POST['index'];
+		$professions = include('professions.php');
+		$pro = $professions[$portal][$vector][$index];
+		$vectors = include('vectors.php');
+		$text = $vectors[$portal][$vector];
+
+		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
+		$message = [
+			'text' => $text,
+			// 'chat_id' => $id,
+			'chat_id' => 771545999,
+			'parse_mode' => 'html',
+			'disable_web_page_preview' => true,
+			'reply_markup' => [
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'Получить консультацию',
+							'url' => $pro['url']
+						]
+					],
+					[
+						[
+							'text' => 'Пригласить друзей',
+							'callback_data' => 'sendReferral' . $index . $vector . $portal
+						]
+					]
+				]
+			]
+		];
+		Bot::sendTelegram('sendMessage', $message);
 	}
 }
