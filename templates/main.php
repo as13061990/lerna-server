@@ -12,8 +12,6 @@
 				<tr>
 					<td>id</td>
 					<td>юзернейм</td>
-					<td>результат</td>
-					<!-- <td>время</td> -->
 				</tr>
 			</thead>
 			<tbody id="tbody">
@@ -21,7 +19,6 @@
 				<tr>
 					<td><?= $user['id'] ?></td>
 					<td><?= $user['username'] ?></td>
-					<!-- <td><span class="unixtime"><?= (int) $user['time'] ?></span><span><?= $user['time'] !== null ? date('Y.m.d H:i:s', $user['time']) : '' ?></span></td> -->
 				</tr>
 			<? } ?>
 			</tbody>

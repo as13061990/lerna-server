@@ -76,6 +76,7 @@ class Bot extends \Basic\Basic {
 			$data = [
 				'text' => "Чтобы получить промокод на дополнительную скидку, нужно направить пригласительную ссылку своим друзьям. Как только 3 ваших друга перейдут по ссылке и запустят бота, вы получите уведомление и персональный промокод со скидкой на образовательный курс! 😊\n\nВаша уникальная ссылка:\nt.me/Lerna_career_bot?start=" . $chat,
 				'parse_mode' => 'html',
+				'disable_web_page_preview' => true,
 				'chat_id' => $chat
 			];
 			return $data;
@@ -126,7 +127,7 @@ class Bot extends \Basic\Basic {
 
 				if ($user['referral'] > 2 && $user['promo'] == 0) {
 					$code = $settings['promo'] + 1;
-					$db->query("UPDATE users SET promo = {?}, time = {?} WHERE id = {?}", array($code, time(), $user['id']));
+					$db->query("UPDATE users SET promo = {?}, time_promo = {?} WHERE id = {?}", array($code, time(), $user['id']));
 					$db->query("UPDATE main SET promo = {?}", array($code));
 				}
 
@@ -146,6 +147,18 @@ class Bot extends \Basic\Basic {
 					"Ура, твои друзья теперь тоже с нами! Ты же не забыл про свой промокод <code>" . $code . "</code>? Успей им воспользоваться и узнай размер финальной скидки у менеджера 😊"
 				);
 				$text = $user['referral'] > 4 ? $text[3] : $text[$user['referral'] - 1];
+
+				$pro = $user['pro'];
+				$portal = substr($pro, 2);
+				$vector = substr($pro, 1, 1);
+				$index = substr($pro, 0, 1);
+				$professions = include('data/professions.php');
+				$profession = $professions[$portal][$vector][$index];
+				$ref = $user['referral'] < 3 ? [[
+					'text' => 'Пригласить еще друзей',
+					'callback_data' => 'sendReferral' . $pro
+				]] : [];
+
 				$data = [
 					'text' => $text,
 					'chat_id' => $user['id'],
@@ -154,10 +167,11 @@ class Bot extends \Basic\Basic {
 						'inline_keyboard' => [
 							[
 								[
-									'text' => 'Узнать профессию',
-									'web_app' => ['url' => 'https://lerna-client.irsapp.ru']
+									'text' => 'Оформить курс',
+									'url' => $profession['url']
 								]
-							]
+							],
+							$ref
 						]
 					]
 				];
@@ -166,7 +180,7 @@ class Bot extends \Basic\Basic {
 		}
 	}
 
-	public static function sendPhoto($id, $texure, $pro) {
+	public static function sendPhoto($id, $texure, $pro, $sendler = false) {
 		global $config;
 
 		$path = realpath(__DIR__ . '/../../uploads') . '/' . $texure . '.png';
@@ -185,7 +199,7 @@ class Bot extends \Basic\Basic {
 					],
 					[
 						[
-							'text' => 'Оформить курс',
+							'text' => $sendler ? 'Узнать про курс' : 'Оформить курс',
 							'url' => $pro['url']
 						]
 					]
@@ -209,7 +223,7 @@ class Bot extends \Basic\Basic {
 		$portal = substr($data, 14);
 		$vector = substr($data, 13, 1);
 		$index = substr($data, 12, 1);
-		$professions = include('professions.php');
+		$professions = include('data/professions.php');
 		$pro = $professions[$portal][$vector][$index];
 
 		$referral = "https://t.me/Lerna_career_bot?start=" . $id;

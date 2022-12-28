@@ -3,7 +3,7 @@
 class API extends \Basic\Basic {
 	
 	public static function test() {
-		parent::success('test');
+		parent::success(time());
 	}
 
 	public static function notFound() {
@@ -24,17 +24,38 @@ class API extends \Basic\Basic {
 		}
 	}
 
+	public static function sendResult() {
+		if (is_numeric($_POST['id'])) {
+			$user = parent::checkUser($_POST);
+			$portal = $_POST['skillbox'] ? 'skillbox' : 'geekbrains';
+			$vector = $_POST['vector'];
+			$index = $_POST['index'];
+			$texture = $_POST['texture'];
+			$old = $_POST['old'] ? '1' : '0';
+			$pro = $index . $vector . $portal;
+			$db = parent::getDb();
+			$db->query("UPDATE users SET pro = {?}, time_pro = {?}, texture = {?}, old = {?} WHERE id = {?}", array($pro, time(), $texture, $old, $_POST['id']));
+		} else {
+			parent::error(2, 'bad user id');
+		}
+	}
+
 	public static function sendAvatar() {
 		$file = realpath(__DIR__ . '/../../templates/images') . '/' . $_POST['texture'] . '.png';
 
 		$portal = $_POST['skillbox'] ? 'skillbox' : 'geekbrains';
-		$data = include('professions.php');
-		$pro = $data[$portal][$_POST['vector']][$_POST['index']];
+		$vector = $_POST['vector'];
+		$index = $_POST['index'];
+		$data = include('data/professions.php');
+		$profession = $data[$portal][$vector][$index];
 		
 		if (is_numeric($_POST['id']) && is_bool($_POST['old']) && file_exists($file) && $data) {
 			$old = $_POST['old'] ? 1 : 0;
 			$texture = $_POST['texture'] . $old . '-' . $_POST['vector'];
 			$exist = file_exists(realpath(__DIR__ . '/../../uploads') . '/' . $texture . '.png');
+
+			$db = parent::getDb();
+			$db->query("UPDATE users SET send_form = {?} WHERE id = {?}", array(1, $_POST['id']));
 
 			if (!$exist) {
 				$width = 2122;
@@ -70,7 +91,7 @@ class API extends \Basic\Basic {
 				}
 				imagepng($canvas, realpath(__DIR__ . '/../../uploads') . '/' . $texture . '.png');
 			}
-			Bot::sendPhoto($_POST['id'], $texture, $pro);
+			Bot::sendPhoto($_POST['id'], $texture, $profession);
 		}
 	}
 
@@ -96,7 +117,7 @@ class API extends \Basic\Basic {
 		$portal = $_POST['portal'];
 		$vector = $_POST['vector'];
 		$index = $_POST['index'];
-		$data = include('professions.php');
+		$data = include('data/professions.php');
 		$professions = $data[$portal][$vector];
 		$result = [];
 		$count = count($professions);
@@ -128,7 +149,7 @@ class API extends \Basic\Basic {
 		$portal = $_POST['portal'];
 		$vector = $_POST['vector'];
 		$index = $_POST['index'];
-		$data = include('professions.php');
+		$data = include('data/professions.php');
 		$pro = $data[$portal][$vector][$index];
 
 		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
@@ -156,16 +177,18 @@ class API extends \Basic\Basic {
 		$portal = $_POST['portal'];
 		$vector = $_POST['vector'];
 		$index = $_POST['index'];
-		$professions = include('professions.php');
+		$professions = include('data/professions.php');
 		$pro = $professions[$portal][$vector][$index];
-		$vectors = include('vectors.php');
+		$vectors = include('data/vectors.php');
 		$text = $vectors[$portal][$vector];
+
+		$db = parent::getDb();
+		$db->query("UPDATE users SET track = {?} WHERE id = {?}", array(1, $id));
 
 		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
 		$message = [
 			'text' => $text,
-			// 'chat_id' => $id,
-			'chat_id' => 771545999,
+			'chat_id' => $id,
 			'parse_mode' => 'html',
 			'disable_web_page_preview' => true,
 			'reply_markup' => [
