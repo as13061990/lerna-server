@@ -3,7 +3,10 @@
 class API extends \Basic\Basic {
 	
 	public static function test() {
-		parent::success(time());
+		$db = parent::getDb();
+		$user = $db->select("SELECT * FROM users WHERE id = {?}", array(771545999))[0];
+		Crontab::sendAvatar($user);
+		// parent::success(time());
 	}
 
 	public static function notFound() {

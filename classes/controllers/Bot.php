@@ -215,6 +215,7 @@ class Bot extends \Basic\Basic {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
 		$result = curl_exec($ch);
+		return $result;
 	}
 
 	private static function sendReferral() {

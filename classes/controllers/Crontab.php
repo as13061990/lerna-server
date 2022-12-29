@@ -295,25 +295,28 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
-	private static function sendAvatar($user) {
+	public static function sendAvatar($user) {
 		$file = realpath(__DIR__ . '/../../templates/images') . '/' . $user['texture'] . '.png';
 
 		$pro = $user['pro'];
+		$old = $user['old'];
+		$id = $user['id'];
 		$portal = substr($pro, 2);
 		$vector = substr($pro, 1, 1);
 		$index = substr($pro, 0, 1);
+		$texture = $user['texture'];
 		$professions = include('data/sendler.php');
 		$profession = $professions[$portal][$vector][$index];
 		
 		if (is_numeric($user['id']) && file_exists($file)) {
-			$old = $user['old'] ? 1 : 0;
-			$texture = $user['texture'] . $old . '-' . $vector;
-			$exist = file_exists(realpath(__DIR__ . '/../../uploads') . '/' . $texture . '.png');
+			$old = $old ? 1 : 0;
+			$image = $user['texture'] . $old . '-' . $vector;
+			$exist = file_exists(realpath(__DIR__ . '/../../uploads') . '/' . $image . '.png');
 
 			if (!$exist) {
 				$width = 2122;
 				$height = 1400;
-				$gender = substr($user['texture'], 0, 4) === 'male' ? 'male' : 'female';
+				$gender = substr($texture, 0, 4) === 'male' ? 'male' : 'female';
 				$canvas = self::createCanvas($width, $height);
 				
 				$bg = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/result-' . $vector . '.png');
@@ -328,23 +331,23 @@ class Crontab extends \Basic\Basic {
 				self::imagecopymerge_alpha($canvas, $user, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($user);
 
-				$hair = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $user['texture'] . '.png');
+				$hair = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $texture . '.png');
 				imagealphablending($hair, false);
 				imagesavealpha($hair, true);
 				self::imagecopymerge_alpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($hair);
 
-				if ($user['old']) {
-					$old = $gender . '-old-' . substr($user['texture'], -1);
+				if ($old) {
+					$old = $gender . '-old-' . substr($texture, -1);
 					$hair = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $old . '.png');
 					imagealphablending($hair, false);
 					imagesavealpha($hair, true);
 					self::imagecopymerge_alpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
 					ImageDestroy($hair);
 				}
-				imagepng($canvas, realpath(__DIR__ . '/../../uploads') . '/' . $texture . '.png');
+				imagepng($canvas, realpath(__DIR__ . '/../../uploads') . '/' . $image . '.png');
 			}
-			Bot::sendPhoto($user['id'], $texture, $profession, true);
+			Bot::sendPhoto($id, $image, $profession, true);
 		}
 	}
 
