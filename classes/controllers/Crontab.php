@@ -89,30 +89,7 @@ class Crontab extends \Basic\Basic {
 				$profession = $professions[$portal][$vector][$index];
 				$vectors = include('data/vectors.php');
 				$text = $vectors[$portal][$vector];
-				
-				$message = [
-					'text' => $text,
-					'chat_id' => $user['id'],
-					'parse_mode' => 'html',
-					'disable_web_page_preview' => true,
-					'reply_markup' => [
-						'inline_keyboard' => [
-							[
-								[
-									'text' => 'Получить консультацию',
-									'url' => $profession['url']
-								]
-							],
-							[
-								[
-									'text' => 'Пригласить друзей',
-									'callback_data' => 'sendReferral' . $user['pro']
-								]
-							]
-						]
-					]
-				];
-				Bot::sendTelegram('sendMessage', $message);
+				Bot::sendTrack($index, $vector, $portal, $text, $user['id'], $profession['url']);
 			}
 		}
 	}
@@ -223,30 +200,7 @@ class Crontab extends \Basic\Basic {
 				$profession = $professions[$portal][$vector][$index];
 				$vectors = include('data/vectors.php');
 				$text = $vectors[$portal][$vector];
-				
-				$message = [
-					'text' => $text,
-					'chat_id' => $user['id'],
-					'parse_mode' => 'html',
-					'disable_web_page_preview' => true,
-					'reply_markup' => [
-						'inline_keyboard' => [
-							[
-								[
-									'text' => 'Получить консультацию',
-									'url' => $profession['url']
-								]
-							],
-							[
-								[
-									'text' => 'Пригласить друзей',
-									'callback_data' => 'sendReferral' . $user['pro']
-								]
-							]
-						]
-					]
-				];
-				Bot::sendTelegram('sendMessage', $message);
+				Bot::sendTrack($index, $vector, $portal, $text, $user['id'], $profession['url']);
 			}
 		}
 	}

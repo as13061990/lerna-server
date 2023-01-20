@@ -246,4 +246,40 @@ class Bot extends \Basic\Basic {
 		];
 		return $data;
 	}
+
+	public static function sendTrack($index, $vector, $portal, $text, $id, $url) {
+		global $config;
+		$path = realpath(__DIR__ . '/../../templates/images') . '/' . $portal . '/' . $vector . '.jpg';
+		$data = [
+			'caption' => $text,
+			'chat_id' => $id,
+			'photo' => new CurlFile($path),
+			'parse_mode' => 'html',
+			'reply_markup' => json_encode([
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'Получить консультацию',
+							'url' => $url
+						]
+					],
+					[
+						[
+							'text' => 'Пригласить друзей',
+							'callback_data' => 'sendReferral' . $index . $vector . $portal
+						]
+					]
+				]
+			])
+		];
+		$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
+		$ch = curl_init(); 
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			"Content-Type: multipart/form-data"
+		));
+		curl_setopt($ch, CURLOPT_URL, $url); 
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
+		$result = curl_exec($ch);
+	}
 }

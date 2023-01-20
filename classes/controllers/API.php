@@ -3,10 +3,7 @@
 class API extends \Basic\Basic {
 	
 	public static function test() {
-		$db = parent::getDb();
-		$user = $db->select("SELECT * FROM users WHERE id = {?}", array(771545999))[0];
-		Crontab::sendAvatar($user);
-		// parent::success(time());
+		parent::success(time() - 86400 - 86400);
 	}
 
 	public static function notFound() {
@@ -176,6 +173,8 @@ class API extends \Basic\Basic {
 	}
 
 	public static function downloadTrack() {
+		global $config;
+
 		$id = $_POST['id'];
 		$portal = $_POST['portal'];
 		$vector = $_POST['vector'];
@@ -188,29 +187,6 @@ class API extends \Basic\Basic {
 		$db = parent::getDb();
 		$db->query("UPDATE users SET track = {?} WHERE id = {?}", array(1, $id));
 
-		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
-		$message = [
-			'text' => $text,
-			'chat_id' => $id,
-			'parse_mode' => 'html',
-			'disable_web_page_preview' => true,
-			'reply_markup' => [
-				'inline_keyboard' => [
-					[
-						[
-							'text' => 'Получить консультацию',
-							'url' => $pro['url']
-						]
-					],
-					[
-						[
-							'text' => 'Пригласить друзей',
-							'callback_data' => 'sendReferral' . $index . $vector . $portal
-						]
-					]
-				]
-			]
-		];
-		Bot::sendTelegram('sendMessage', $message);
+		Bot::sendTrack($index, $vector, $portal, $text, $id, $pro['url']);
 	}
 }
