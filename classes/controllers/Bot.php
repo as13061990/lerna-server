@@ -118,7 +118,7 @@ class Bot extends \Basic\Basic {
 		if (is_numeric($referral)) {
 			$user = $db->select("SELECT * FROM users WHERE id = {?}", array($referral))[0];
 
-			if ($user) {
+			if ($user && $user['id'] != $referral) {
 				$db->query("UPDATE main SET referral = referral + 1");
 				$user['referral'] += 1;
 				$db->query("UPDATE users SET referral = {?} WHERE id = {?}", array($user['referral'], $user['id']));
