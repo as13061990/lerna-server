@@ -2,6 +2,9 @@
 
 class Admin extends \Basic\Basic {
 	
+	/**
+	 * Главная страница админки
+	 */
 	public static function main() {
 		$db = parent::getDb();
 		$main = $db->select("SELECT * FROM main")[0];

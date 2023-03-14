@@ -2,14 +2,23 @@
 
 class API extends \Basic\Basic {
 	
+	/**
+	 * Тестовый маршрут
+	 */
 	public static function test() {
 		parent::success(time() - 86400 - 86400);
 	}
 
+	/**
+	 * Страница не найдена
+	 */
 	public static function notFound() {
 		parent::error(1);
 	}
 
+	/**
+	 * Маршрут возврата данных пользователя
+	 */
 	public static function getData() {
 		if (is_numeric($_POST['id'])) {
 			$user = parent::checkUser($_POST);
@@ -24,6 +33,9 @@ class API extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Маршрут результата тестирования
+	 */
 	public static function sendResult() {
 		if (is_numeric($_POST['id'])) {
 			$user = parent::checkUser($_POST);
@@ -40,6 +52,9 @@ class API extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Маршрут отправки аватара
+	 */
 	public static function sendAvatar() {
 		$file = realpath(__DIR__ . '/../../templates/images') . '/' . $_POST['texture'] . '.png';
 
@@ -66,19 +81,19 @@ class API extends \Basic\Basic {
 				$bg = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/result-' . $_POST['vector'] . '.png');
 				imagealphablending($bg, false);
 				imagesavealpha($bg, true);
-				self::imagecopymerge_alpha($canvas, $bg, 0, 0, 0, 0, $width, $height, 100);
+				self::imageCopyMergeAlpha($canvas, $bg, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($bg);
 
 				$user = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $gender . '.png');
 				imagealphablending($user, false);
 				imagesavealpha($user, true);
-				self::imagecopymerge_alpha($canvas, $user, 0, 0, 0, 0, $width, $height, 100);
+				self::imageCopyMergeAlpha($canvas, $user, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($user);
 
 				$hair = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $_POST['texture'] . '.png');
 				imagealphablending($hair, false);
 				imagesavealpha($hair, true);
-				self::imagecopymerge_alpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
+				self::imageCopyMergeAlpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($hair);
 
 				if ($_POST['old']) {
@@ -86,7 +101,7 @@ class API extends \Basic\Basic {
 					$hair = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $old . '.png');
 					imagealphablending($hair, false);
 					imagesavealpha($hair, true);
-					self::imagecopymerge_alpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
+					self::imageCopyMergeAlpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
 					ImageDestroy($hair);
 				}
 				imagepng($canvas, realpath(__DIR__ . '/../../uploads') . '/' . $texture . '.png');
@@ -95,6 +110,9 @@ class API extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Создание холста картинки
+	 */
 	private static function createCanvas($width, $height) {
 		$image = imagecreatetruecolor($width, $height);
 		imagealphablending($image, false);
@@ -104,7 +122,10 @@ class API extends \Basic\Basic {
 		return $image;
 	}
 	
-	private static function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct) {
+	/**
+	 * Объединение картинок
+	 */
+	private static function imageCopyMergeAlpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct) {
         $cut = imagecreatetruecolor($src_w, $src_h);
         imagecopy($cut, $dst_im, 0, 0, $dst_x, $dst_y, $src_w, $src_h);
         imagecopy($cut, $src_im, 0, 0, $src_x, $src_y, $src_w, $src_h);
@@ -112,6 +133,9 @@ class API extends \Basic\Basic {
         ImageDestroy($cut);
 	}
 
+	/**
+	 * Маршрут кнопки "Отправить еще профессии"
+	 */
 	public static function moreProfessions() {
 		$id = $_POST['id'];
 		$portal = $_POST['portal'];
@@ -130,11 +154,9 @@ class API extends \Basic\Basic {
 			}
 		}
 		shuffle($result);
-		
 		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
 		$link1 = "    1. <u><a href=\"" . $result[0]['url'] . "\">" . $result[0]['name'] . "</a></u>\n    " . $result[0]['short_descr'];
 		$link2 = "    2. <u><a href=\"" . $result[1]['url'] . "\">" . $result[1]['name'] . "</a></u>\n    " . $result[1]['short_descr'];
-
 		$message = [
 			'text' => "Также вам подойдут такие профессии, как:\n" . $link1 . "\n" . $link2 . "\n\nДля получения дополнительной скидки на курс не забудьте пригласить трех друзей: " . $referral,
 			'chat_id' => $id,
@@ -144,6 +166,9 @@ class API extends \Basic\Basic {
 		Bot::sendTelegram('sendMessage', $message);
 	}
 
+	/**
+	 * Маршрут кнопки "Пригласить друзей"
+	 */
 	public static function referral() {
 		$id = $_POST['id'];
 		$portal = $_POST['portal'];
@@ -151,7 +176,6 @@ class API extends \Basic\Basic {
 		$index = $_POST['index'];
 		$data = include('data/professions.php');
 		$pro = $data[$portal][$vector][$index];
-
 		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
 		$message = [
 			'text' => "Чтобы получить промокод на дополнительную скидку, пригласите своих друзей пройти тест. Как только 3 ваших друга перейдут по ссылке и запустят бота, вы получите уведомление и персональный промокод со скидкой на образовательный курс! 😊\n\nВаша уникальная ссылка: ". $referral,
@@ -172,9 +196,11 @@ class API extends \Basic\Basic {
 		Bot::sendTelegram('sendMessage', $message);
 	}
 
+	/**
+	 * Маршрут скачивания "трэка"
+	 */
 	public static function downloadTrack() {
 		global $config;
-
 		$id = $_POST['id'];
 		$portal = $_POST['portal'];
 		$vector = $_POST['vector'];
@@ -183,10 +209,8 @@ class API extends \Basic\Basic {
 		$pro = $professions[$portal][$vector][$index];
 		$vectors = include('data/vectors.php');
 		$text = $vectors[$portal][$vector];
-
 		$db = parent::getDb();
 		$db->query("UPDATE users SET track = {?} WHERE id = {?}", array(1, $id));
-
 		Bot::sendTrack($index, $vector, $portal, $text, $id, $pro['url']);
 	}
 }

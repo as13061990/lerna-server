@@ -4,6 +4,9 @@ namespace Basic;
 
 class Basic extends \DB\Db {
 
+	/**
+	 * Шаблонизатор
+	 */
 	protected static function loadView($strViewPath, $arrayOfData) {
 		extract($arrayOfData);
 		ob_start();
@@ -13,11 +16,17 @@ class Basic extends \DB\Db {
 		return $strView;
 	}
 
+	/**
+	 * Dev log
+	 */
 	protected static function log($text) {
 		$text = json_encode($text, JSON_UNESCAPED_UNICODE);
 		file_put_contents('logs.txt', $text."\n", FILE_APPEND);
 	}
 	
+	/**
+	 * Ответ ошибки
+	 */
 	protected static function error($type = 0, $data = null) {
 		echo json_encode(array(
 			'error' => true,
@@ -27,6 +36,9 @@ class Basic extends \DB\Db {
 		exit();
 	}
 
+	/**
+	 * Успешный ответ
+	 */
 	protected static function success($data = null) {
 		if (is_array($data)) {
 
@@ -60,6 +72,9 @@ class Basic extends \DB\Db {
 		exit();
 	}
 
+	/**
+	 * Сохранение в БД юзера
+	 */
 	protected static function checkUser($data) {
 		$db = parent::getDb();
 		$user = $db->select("SELECT * FROM users WHERE id = {?}", array($data['id']))[0];

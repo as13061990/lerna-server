@@ -2,6 +2,9 @@
 
 class Crontab extends \Basic\Basic {
 	
+	/**
+	 * Маршрут для crontab. Запускается раз в 5 минут
+	 */
 	public static function main() {
 		self::sendler5min();
 		self::sendler1nf();
@@ -12,6 +15,9 @@ class Crontab extends \Basic\Basic {
 		self::sendler3f();
 	}
 
+	/**
+	 * Отправка аватара спустя 5 минут, если не заполнил форму
+	 */
 	private static function sendler5min() {
 		$db = parent::getDb();
 		$time = time();
@@ -27,6 +33,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка сообщения спустя сутки, если не заполнил форму
+	 */
 	private static function sendler1nf() {
 		$db = parent::getDb();
 		$time = time();
@@ -71,6 +80,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка сообщения спустя двое суток, если не заполнил форму
+	 */
 	private static function sendler2nf() {
 		$db = parent::getDb();
 		$time = time();
@@ -94,6 +106,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка сообщения спустя трое суток, если не заполнил форму
+	 */
 	private static function sendler3nf() {
 		$db = parent::getDb();
 		$time = time();
@@ -138,6 +153,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка сообщения спустя сутки, если заполнил форму
+	 */
 	private static function sendler1f() {
 		$db = parent::getDb();
 		$time = time();
@@ -182,6 +200,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка сообщения спустя двое суток, если заполнил форму
+	 */
 	private static function sendler2f() {
 		$db = parent::getDb();
 		$time = time();
@@ -205,6 +226,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка сообщения спустя трое суток, если заполнил форму
+	 */
 	private static function sendler3f() {
 		$db = parent::getDb();
 		$time = time();
@@ -249,6 +273,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка аватара
+	 */
 	public static function sendAvatar($user) {
 		$file = realpath(__DIR__ . '/../../templates/images') . '/' . $user['texture'] . '.png';
 
@@ -276,19 +303,19 @@ class Crontab extends \Basic\Basic {
 				$bg = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/result-' . $vector . '.png');
 				imagealphablending($bg, false);
 				imagesavealpha($bg, true);
-				self::imagecopymerge_alpha($canvas, $bg, 0, 0, 0, 0, $width, $height, 100);
+				self::imageCopyMergeAlpha($canvas, $bg, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($bg);
 
 				$user = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $gender . '.png');
 				imagealphablending($user, false);
 				imagesavealpha($user, true);
-				self::imagecopymerge_alpha($canvas, $user, 0, 0, 0, 0, $width, $height, 100);
+				self::imageCopyMergeAlpha($canvas, $user, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($user);
 
 				$hair = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $texture . '.png');
 				imagealphablending($hair, false);
 				imagesavealpha($hair, true);
-				self::imagecopymerge_alpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
+				self::imageCopyMergeAlpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
 				ImageDestroy($hair);
 
 				if ($old) {
@@ -296,7 +323,7 @@ class Crontab extends \Basic\Basic {
 					$hair = Imagecreatefrompng(realpath(__DIR__ . '/../../templates/images') . '/' . $old . '.png');
 					imagealphablending($hair, false);
 					imagesavealpha($hair, true);
-					self::imagecopymerge_alpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
+					self::imageCopyMergeAlpha($canvas, $hair, 0, 0, 0, 0, $width, $height, 100);
 					ImageDestroy($hair);
 				}
 				imagepng($canvas, realpath(__DIR__ . '/../../uploads') . '/' . $image . '.png');
@@ -305,6 +332,9 @@ class Crontab extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Создание холста картинки
+	 */
 	private static function createCanvas($width, $height) {
 		$image = imagecreatetruecolor($width, $height);
 		imagealphablending($image, false);
@@ -314,7 +344,10 @@ class Crontab extends \Basic\Basic {
 		return $image;
 	}
 	
-	private static function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct) {
+	/**
+	 * Объединение картинок
+	 */
+	private static function imageCopyMergeAlpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct) {
         $cut = imagecreatetruecolor($src_w, $src_h);
         imagecopy($cut, $dst_im, 0, 0, $dst_x, $dst_y, $src_w, $src_h);
         imagecopy($cut, $src_im, 0, 0, $src_x, $src_y, $src_w, $src_h);

@@ -2,6 +2,9 @@
 
 class Bot extends \Basic\Basic {
 	
+	/**
+	 * Входящая точка бота
+	 */
 	public static function main() {
 		if ($_POST['message']['entities'][0]['type'] != 'bot_command' && $_POST['message']['from']['id'] != $_POST['message']['chat']['id']) {
 			exit();
@@ -23,6 +26,9 @@ class Bot extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка ботом сообщения
+	 */
 	public static function sendTelegram($method, $data, $headers = []) {
 		global $config;
 		$curl = curl_init();
@@ -39,6 +45,9 @@ class Bot extends \Basic\Basic {
 		return json_decode($result, true);
 	}
 
+	/**
+	 * Кнопка бота - старт
+	 */
 	private static function start() {
 		$from = $_POST['message']['from'];
 		$chat = $_POST['message']['chat']['id'];
@@ -66,6 +75,9 @@ class Bot extends \Basic\Basic {
 		return false;
 	}
 
+	/**
+	 * Кнопка бота - пригласить друзей
+	 */
 	private static function referral() {
 		$from = $_POST['callback_query']['from'];
 
@@ -84,6 +96,9 @@ class Bot extends \Basic\Basic {
 		return false;
 	}
 
+	/**
+	 * Неизвестная команда
+	 */
 	private static function badCommand() {
 		$from = $_POST['message']['from'];
 		$chat = $_POST['message']['chat']['id'];
@@ -110,6 +125,9 @@ class Bot extends \Basic\Basic {
 		return false;
 	}
 
+	/**
+	 * Проверка реферала
+	 */
 	private static function checkReferral($id) {
 		$db = parent::getDb();
 		$ref = $_POST['message']['text'];
@@ -180,6 +198,9 @@ class Bot extends \Basic\Basic {
 		}
 	}
 
+	/**
+	 * Отправка фото
+	 */
 	public static function sendPhoto($id, $texure, $pro, $sendler = false) {
 		global $config;
 
@@ -218,6 +239,9 @@ class Bot extends \Basic\Basic {
 		return $result;
 	}
 
+	/**
+	 * Отправка реферальной ссылки
+	 */
 	private static function sendReferral() {
 		$id = $_POST['callback_query']['from']['id'];
 		$data = $_POST['callback_query']['data'];
@@ -247,6 +271,9 @@ class Bot extends \Basic\Basic {
 		return $data;
 	}
 
+	/**
+	 * Отправка "трэка"
+	 */
 	public static function sendTrack($index, $vector, $portal, $text, $id, $url) {
 		global $config;
 		$path = realpath(__DIR__ . '/../../templates/images') . '/' . $portal . '/' . $vector . '.jpg';
