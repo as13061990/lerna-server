@@ -55,6 +55,7 @@ class Bot extends \Basic\Basic {
 		if (is_numeric($from['id'])) {
 			$user = parent::checkUser($from);
 			self::checkReferral($chat);
+			global $config;
 
 			$data = [
 				'text' => "Привет! Хотите пройти тестирование и узнать, какая профессия идеально подходит именно вам?",
@@ -64,7 +65,7 @@ class Bot extends \Basic\Basic {
 						[
 							[
 								'text' => 'Узнать профессию',
-								'web_app' => ['url' => 'https://lerna-client.irsapp.ru']
+								'web_app' => ['url' => $config['web_app']]
 							]
 						]
 					]
@@ -105,6 +106,7 @@ class Bot extends \Basic\Basic {
 		
 		if (is_numeric($from['id'])) {
 			$user = parent::checkUser($from);
+			global $config;
 
 			$data = [
 				'text' => "Пожалуйста, используйте кнопку",
@@ -114,7 +116,7 @@ class Bot extends \Basic\Basic {
 						[
 							[
 								'text' => 'Узнать профессию',
-								'web_app' => ['url' => 'https://lerna-client.irsapp.ru']
+								'web_app' => ['url' => $config['web_app']]
 							]
 						]
 					]
