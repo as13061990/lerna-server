@@ -46,7 +46,8 @@ class API extends \Basic\Basic {
 			$old = $_POST['old'] ? '1' : '0';
 			$pro = $index . $vector . $portal;
 			$db = parent::getDb();
-			$db->query("UPDATE users SET pro = {?}, time_pro = {?}, texture = {?}, old = {?} WHERE id = {?}", array($pro, time(), $texture, $old, $_POST['id']));
+			$db->query("UPDATE users SET pro = {?}, time_pro = {?}, texture = {?}, old = {?} WHERE id = {?}", array($pro, time(), $texture, $old, $user['id']));
+			Statistics::writeResult($user['id'], $pro);
 		} else {
 			parent::error(2, 'bad user id');
 		}

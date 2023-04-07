@@ -58,11 +58,11 @@
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="basicExampleNav">
-				<!-- <ul class="navbar-nav mr-auto smooth-scroll">
+				<ul class="navbar-nav mr-auto smooth-scroll">
 					<li class="nav-item">
-						<a href="/link" class="nav-link waves-effect waves-light">Другой раздел</a>
+						<a href="/results" class="nav-link waves-effect waves-light">Тестирования</a>
 					</li>
-				</ul> -->
+				</ul>
 			</div>
 		</div>
 	</nav>

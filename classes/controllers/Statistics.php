@@ -17,4 +17,12 @@ class Statistics extends \Basic\Basic {
 		$db = parent::getDb();
 		$db->query("UPDATE users SET web_app = {?} WHERE id = {?}", array(1, $id));
 	}
+
+	/**
+	 * Запись в статистику не уникального прохождения тестирования
+	 */
+	public static function writeResult($id, $pro) {
+		$db = parent::getDb();
+		$db->query("INSERT IGNORE INTO results SET user_id = {?}, profession = {?}", array($id, $pro));
+	}
 }
