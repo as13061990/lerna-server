@@ -17,6 +17,10 @@ class Bot extends \Basic\Basic {
 			$data = self::referral();
 		} else if (substr($_POST['callback_query']['data'], 0, 12) == 'sendReferral') {
 			$data = self::sendReferral();
+		} else if (substr($_POST['callback_query']['data'], 0, 12) == 'aboutCompany') {
+			$data = self::aboutCompany();
+		} else if (substr($_POST['callback_query']['data'], 0, 10) == 'whatUseful') {
+			$data = self::whatUseful();
 		} else {
 			$data = self::badCommand();
 		}
@@ -58,20 +62,124 @@ class Bot extends \Basic\Basic {
 			global $config;
 
 			$data = [
-				'text' => "Привет! Хотите пройти тестирование и узнать, какая профессия идеально подходит именно вам?",
+				'text' => "Привет! Я бот образовательной площадки Lerna. Что такое Lerna и чем я полезен, можете прочесть по кнопкам ниже.\n\nИли можете сразу пройти тестирование и узнать, в какой профессии у вас есть высокий шанс добиться карьерного роста.",
 				'chat_id' => $chat,
 				'reply_markup' => [
 					'inline_keyboard' => [
 						[
 							[
+								'text' => 'О компании',
+								"callback_data" => "aboutCompany"
+							]
+						],
+						[
+							[
+								'text' => 'Чем полезен бот',
+								"callback_data" => "whatUseful"
+							]
+						],
+						[
+							[
 								'text' => 'Узнать профессию',
 								'web_app' => ['url' => $config['web_app']]
 							]
-						]
+						],
 					]
 				]
 			];
 			return $data;
+		}
+		return false;
+	}
+
+	/**
+	 * Кнопка бота - О компании
+	 */
+	private static function aboutCompany() {
+		$from = $_POST['callback_query']['from'];
+
+		if (is_numeric($from['id'])) {
+			$user = parent::checkUser($from);
+			global $config;
+
+			$path = realpath(__DIR__ . '/../../public/images') . '/Lerna_About.jpg';
+			$data = [
+				'caption' => "Lerna – это образовательная платформа с курсами от ведущих школ онлайн-обучения Skillbox и Geekbrains. Можно освоить с нуля или прокачать свои скиллы в популярных направлениях: программирование, управление, маркетинг, разработка игр, дизайн, мультимедиа и тд.\n\nНа платформе более 650 онлайн-курсов, 580 экспертов, 160 тыс студентов по всему СНГ. А выпускникам доступны онлайн и офлайн консультации по профориентированию и помощь с трудоустройством от Центра развития карьеры.",
+				'chat_id' => $from['id'],
+				'photo' => new CurlFile($path),
+				'parse_mode' => 'html',
+				'reply_markup' => json_encode([
+					'inline_keyboard' => [
+						[
+							[
+								'text' => 'Чем полезен бот',
+								"callback_data" => "whatUseful"
+							]
+						],
+						[
+							[
+								'text' => 'Узнать профессию',
+								'web_app' => ['url' => $config['web_app']]
+							]
+						],
+					]
+				])
+			];
+			$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
+			$ch = curl_init(); 
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+				"Content-Type: multipart/form-data"
+			));
+			curl_setopt($ch, CURLOPT_URL, $url); 
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
+			$result = curl_exec($ch);
+		}
+		return false;
+	}
+
+	/**
+	 * Кнопка бота - Чем полезен бот
+	 */
+	private static function whatUseful() {
+		$from = $_POST['callback_query']['from'];
+
+		if (is_numeric($from['id'])) {
+			$user = parent::checkUser($from);
+			global $config;
+
+			$path = realpath(__DIR__ . '/../../public/images') . '/Lerna_Useful.jpg';
+			$data = [
+				'caption' => "Я могу подсказать, в каких профессиях вы реализуете себя как сильный специалист и построите карьеру. Для этого пройдите профтест.\n\nТакже я могу познакомить вас с новыми развивающимися IT-профессиями. Подробнее рассказать, что сейчас востребовано и популярно, что останется актуальным в будущем и к чему стоит присмотреться, если вы не знаете, где и как освоить новую профессию.",
+				'chat_id' => $from['id'],
+				'photo' => new CurlFile($path),
+				'parse_mode' => 'html',
+				'reply_markup' => json_encode([
+					'inline_keyboard' => [
+						[
+							[
+								'text' => 'О компании',
+								"callback_data" => "aboutCompany"
+							]
+						],
+						[
+							[
+								'text' => 'Узнать профессию',
+								'web_app' => ['url' => $config['web_app']]
+							]
+						],
+					]
+				])
+			];
+			$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
+			$ch = curl_init(); 
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+				"Content-Type: multipart/form-data"
+			));
+			curl_setopt($ch, CURLOPT_URL, $url); 
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
+			$result = curl_exec($ch);
 		}
 		return false;
 	}
@@ -113,6 +221,18 @@ class Bot extends \Basic\Basic {
 				'chat_id' => $chat,
 				'reply_markup' => [
 					'inline_keyboard' => [
+						[
+							[
+								'text' => 'О компании',
+								"callback_data" => "aboutCompany"
+							]
+						],
+						[
+							[
+								'text' => 'Чем полезен бот',
+								"callback_data" => "whatUseful"
+							]
+						],
 						[
 							[
 								'text' => 'Узнать профессию',
