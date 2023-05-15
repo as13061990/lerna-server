@@ -61,31 +61,35 @@ class Bot extends \Basic\Basic {
 			self::checkReferral($chat);
 			global $config;
 
+			$buttons = [
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'О компании',
+							"callback_data" => "aboutCompany"
+						]
+					],
+					[
+						[
+							'text' => 'Чем полезен бот',
+							"callback_data" => "whatUseful"
+						]
+					],
+					[
+						[
+							'text' => 'Узнать профессию',
+							'web_app' => ['url' => $config['web_app']]
+						]
+					],
+				]
+			];
+			$db = parent::getDb();
+			$db->query("UPDATE users SET buttons = {?} WHERE id = {?}", array(json_encode($buttons), $chat));
+
 			$data = [
 				'text' => "Привет! Я бот образовательной площадки Lerna. Что такое Lerna и чем я полезен, можете прочесть по кнопкам ниже.\n\nИли можете сразу пройти тестирование и узнать, в какой профессии у вас есть высокий шанс добиться карьерного роста.",
 				'chat_id' => $chat,
-				'reply_markup' => [
-					'inline_keyboard' => [
-						[
-							[
-								'text' => 'О компании',
-								"callback_data" => "aboutCompany"
-							]
-						],
-						[
-							[
-								'text' => 'Чем полезен бот',
-								"callback_data" => "whatUseful"
-							]
-						],
-						[
-							[
-								'text' => 'Узнать профессию',
-								'web_app' => ['url' => $config['web_app']]
-							]
-						],
-					]
-				]
+				'reply_markup' => $buttons
 			];
 			return $data;
 		}
@@ -102,28 +106,32 @@ class Bot extends \Basic\Basic {
 			$user = parent::checkUser($from);
 			global $config;
 
+			$buttons = [
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'Чем полезен бот',
+							"callback_data" => "whatUseful"
+						]
+					],
+					[
+						[
+							'text' => 'Узнать профессию',
+							'web_app' => ['url' => $config['web_app']]
+						]
+					],
+				]
+			];
+			$db = parent::getDb();
+			$db->query("UPDATE users SET buttons = {?} WHERE id = {?}", array(json_encode($buttons), $from['id']));
+
 			$path = realpath(__DIR__ . '/../../public/images') . '/Lerna_About.jpg';
 			$data = [
 				'caption' => "Lerna – это образовательная платформа с курсами от ведущих школ онлайн-обучения Skillbox и Geekbrains. Можно освоить с нуля или прокачать свои скиллы в популярных направлениях: программирование, управление, маркетинг, разработка игр, дизайн, мультимедиа и тд.\n\nНа платформе более 650 онлайн-курсов, 580 экспертов, 160 тыс студентов по всему СНГ. А выпускникам доступны онлайн и офлайн консультации по профориентированию и помощь с трудоустройством от Центра развития карьеры.",
 				'chat_id' => $from['id'],
 				'photo' => new CurlFile($path),
 				'parse_mode' => 'html',
-				'reply_markup' => json_encode([
-					'inline_keyboard' => [
-						[
-							[
-								'text' => 'Чем полезен бот',
-								"callback_data" => "whatUseful"
-							]
-						],
-						[
-							[
-								'text' => 'Узнать профессию',
-								'web_app' => ['url' => $config['web_app']]
-							]
-						],
-					]
-				])
+				'reply_markup' => json_encode($buttons)
 			];
 			$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
 			$ch = curl_init(); 
@@ -147,6 +155,25 @@ class Bot extends \Basic\Basic {
 		if (is_numeric($from['id'])) {
 			$user = parent::checkUser($from);
 			global $config;
+			
+			$buttons = [
+				'inline_keyboard' => [
+					[
+						[
+							'text' => 'О компании',
+							"callback_data" => "aboutCompany"
+						]
+					],
+					[
+						[
+							'text' => 'Узнать профессию',
+							'web_app' => ['url' => $config['web_app']]
+						]
+					],
+				]
+			];
+			$db = parent::getDb();
+			$db->query("UPDATE users SET buttons = {?} WHERE id = {?}", array(json_encode($buttons), $from['id']));
 
 			$path = realpath(__DIR__ . '/../../public/images') . '/Lerna_Useful.jpg';
 			$data = [
@@ -154,22 +181,7 @@ class Bot extends \Basic\Basic {
 				'chat_id' => $from['id'],
 				'photo' => new CurlFile($path),
 				'parse_mode' => 'html',
-				'reply_markup' => json_encode([
-					'inline_keyboard' => [
-						[
-							[
-								'text' => 'О компании',
-								"callback_data" => "aboutCompany"
-							]
-						],
-						[
-							[
-								'text' => 'Узнать профессию',
-								'web_app' => ['url' => $config['web_app']]
-							]
-						],
-					]
-				])
+				'reply_markup' => json_encode($buttons)
 			];
 			$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
 			$ch = curl_init(); 
@@ -215,32 +227,11 @@ class Bot extends \Basic\Basic {
 		if (is_numeric($from['id'])) {
 			$user = parent::checkUser($from);
 			global $config;
-
+			
 			$data = [
-				'text' => "Пожалуйста, используйте кнопку",
+				'text' => "Пожалуйста, используйте кнопки",
 				'chat_id' => $chat,
-				'reply_markup' => [
-					'inline_keyboard' => [
-						[
-							[
-								'text' => 'О компании',
-								"callback_data" => "aboutCompany"
-							]
-						],
-						[
-							[
-								'text' => 'Чем полезен бот',
-								"callback_data" => "whatUseful"
-							]
-						],
-						[
-							[
-								'text' => 'Узнать профессию',
-								'web_app' => ['url' => $config['web_app']]
-							]
-						]
-					]
-				]
+				'reply_markup' => json_decode($user['buttons'])
 			];
 			return $data;
 		}
@@ -299,21 +290,24 @@ class Bot extends \Basic\Basic {
 					'callback_data' => 'sendReferral' . $pro
 				]] : [];
 
+				$buttons = [
+					'inline_keyboard' => [
+						[
+							[
+								'text' => 'Оформить курс',
+								'url' => $profession['url']
+							]
+						],
+						$ref
+					]
+				];
+				$db->query("UPDATE users SET buttons = {?} WHERE id = {?}", array(json_encode($buttons), $user['id']));
+
 				$data = [
 					'text' => $text,
 					'chat_id' => $user['id'],
 					'parse_mode' => 'html',
-					'reply_markup' => [
-						'inline_keyboard' => [
-							[
-								[
-									'text' => 'Оформить курс',
-									'url' => $profession['url']
-								]
-							],
-							$ref
-						]
-					]
+					'reply_markup' => $buttons
 				];
 				self::sendTelegram('sendMessage', $data);
 			}
@@ -325,6 +319,25 @@ class Bot extends \Basic\Basic {
 	 */
 	public static function sendPhoto($id, $texure, $pro, $sendler = false) {
 		global $config;
+		$db = parent::getDb();
+
+		$buttons = [
+			'inline_keyboard' => [
+				[
+					[
+						'text' => 'Пригласить друзей',
+						"callback_data" => "referral"
+					]
+				],
+				[
+					[
+						'text' => $sendler ? 'Узнать про курс' : 'Оформить курс',
+						'url' => $pro['url']
+					]
+				]
+			]
+		];
+		$db->query("UPDATE users SET buttons = {?} WHERE id = {?}", array(json_encode($buttons), $id));
 
 		$path = realpath(__DIR__ . '/../../uploads') . '/' . $texure . '.png';
 		$data = [
@@ -332,22 +345,7 @@ class Bot extends \Basic\Basic {
 			'chat_id' => $id,
 			'photo' => new CurlFile($path),
 			'parse_mode' => 'html',
-			'reply_markup' => json_encode([
-				'inline_keyboard' => [
-					[
-						[
-							'text' => 'Пригласить друзей',
-							"callback_data" => "referral"
-						]
-					],
-					[
-						[
-							'text' => $sendler ? 'Узнать про курс' : 'Оформить курс',
-							'url' => $pro['url']
-						]
-					]
-				]
-			])
+			'reply_markup' => json_encode($buttons)
 		];
 		$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
 		$ch = curl_init(); 
@@ -373,22 +371,26 @@ class Bot extends \Basic\Basic {
 		$professions = include('data/professions.php');
 		$pro = $professions[$portal][$vector][$index];
 
+		$buttons = [
+			'inline_keyboard' => [
+				[
+					[
+						'text' => 'Оформить курс',
+						'url' => $pro['url']
+					]
+				]
+			]
+		];
+		$db = parent::getDb();
+		$db->query("UPDATE users SET buttons = {?} WHERE id = {?}", array(json_encode($buttons), $id));
+
 		$referral = "https://t.me/Lerna_career_bot?start=" . $id;
 		$data = [
 			'text' => "Чтобы получить промокод на дополнительную скидку, пригласите своих друзей пройти тест. Как только 3 ваших друга перейдут по ссылке и запустят бота, вы получите уведомление и персональный промокод со скидкой на образовательный курс! 😊\n\nВаша уникальная ссылка: ". $referral,
 			'chat_id' => $id,
 			'parse_mode' => 'html',
 			'disable_web_page_preview' => true,
-			'reply_markup' => [
-				'inline_keyboard' => [
-					[
-						[
-							'text' => 'Оформить курс',
-							'url' => $pro['url']
-						]
-					]
-				]
-			]
+			'reply_markup' => $buttons
 		];
 		return $data;
 	}
@@ -398,28 +400,32 @@ class Bot extends \Basic\Basic {
 	 */
 	public static function sendTrack($index, $vector, $portal, $text, $id, $url) {
 		global $config;
+		$db = parent::getDb();
+		$buttons = [
+			'inline_keyboard' => [
+				[
+					[
+						'text' => 'Получить консультацию',
+						'url' => $url
+					]
+				],
+				[
+					[
+						'text' => 'Пригласить друзей',
+						'callback_data' => 'sendReferral' . $index . $vector . $portal
+					]
+				]
+			]
+		];
+		$db->query("UPDATE users SET buttons = {?} WHERE id = {?}", array(json_encode($buttons), $id));
+
 		$path = realpath(__DIR__ . '/../../templates/images') . '/' . $portal . '/' . $vector . '.jpg';
 		$data = [
 			'caption' => $text,
 			'chat_id' => $id,
 			'photo' => new CurlFile($path),
 			'parse_mode' => 'html',
-			'reply_markup' => json_encode([
-				'inline_keyboard' => [
-					[
-						[
-							'text' => 'Получить консультацию',
-							'url' => $url
-						]
-					],
-					[
-						[
-							'text' => 'Пригласить друзей',
-							'callback_data' => 'sendReferral' . $index . $vector . $portal
-						]
-					]
-				]
-			])
+			'reply_markup' => json_encode($buttons)
 		];
 		$url = 'https://api.telegram.org/bot' . $config['token'] . '/sendPhoto';
 		$ch = curl_init(); 
